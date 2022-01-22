@@ -9,10 +9,10 @@ using UnityEngine;
 
 public static class UIUtils
 {
-
+    
     static PluginManager.PluginInfo FindPlugin()
     {
-        ulong WORKSHOP_ID = 2727358367;
+        ulong WORKSHOP_ID = 2727374103;
         string pluginName = "ExportElectricity";
 
         foreach (var mod in Singleton<PluginManager>.instance.GetPluginsInfo())
@@ -38,6 +38,7 @@ public static class UIUtils
             throw new Exception("Cannot find plugin path.");
         }        
     }
+    
 
     public static UITextureAtlas CreateTextureAtlas(string modName, string textureFile, string atlasName, int spriteWidth, int spriteHeight, string[] spriteNames)
     {
@@ -53,7 +54,11 @@ public static class UIUtils
             throw new Exception("atlasMaterial null");
         }
 
-        var bytes = File.ReadAllBytes(Path.Combine(FindModPath(), textureFile));
+
+        var modpath = FindModPath();
+
+        var bytes = File.ReadAllBytes($"{modpath}/{textureFile}");
+        
 
         Texture2D tex = new Texture2D(spriteWidth * spriteNames.Length, spriteHeight, TextureFormat.ARGB32, false);
         tex.LoadImage(bytes);

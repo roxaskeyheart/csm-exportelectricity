@@ -1,4 +1,5 @@
-﻿using ICities;
+﻿using ColossalFramework.UI;
+using ICities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ namespace Exportable
 		private float multiplier;
         private const double interval = 1.0;
         private double waited = 0.0;
+		private UISlider textbox;
 
 		public ExportableManager ()
 		{
@@ -80,7 +82,7 @@ namespace Exportable
 			}
 		}
 
-		public void StoreSettings ()
+		public void StoreSettings()
 		{
 			Log ("Store Settings");
 			try {
@@ -147,12 +149,18 @@ namespace Exportable
 				Exportable exp = exportables [id];
 				group.AddCheckbox(exp.Description, exp.GetEnabled(), exp.SetEnabled);
 			}
-			group.AddSlider ("Multiplier", 0.0f, 2.0f, 0.05f, multiplier, MultiplierSliderChanged);
+
+			textbox = group.AddSlider($"Multiplier", 0.0f, 2.0f, 0.05f, multiplier, MultiplierSliderChanged) as UISlider;
 			group.AddCheckbox ("Debug Mode", ExportElectricityMod.Debugger.enabled, SetDebug);
 		}
 
 		private void MultiplierSliderChanged(float val)
 		{
+			if (textbox != null)
+			{
+				textbox.tooltip = $"{multiplier}";
+			}
+
 			multiplier = val;
 			StoreSettings();
 		}
