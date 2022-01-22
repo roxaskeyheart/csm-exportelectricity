@@ -51,7 +51,7 @@ namespace ExportElectricityMod
 	{
 		public string Name 
 		{
-			get { return "Export Electricity Mod"; }
+			get { return "Export Electricity Revisited"; }
 		}
 
 		public string Description 

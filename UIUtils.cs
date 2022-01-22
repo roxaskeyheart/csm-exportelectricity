@@ -12,20 +12,8 @@ public static class UIUtils
 
     static PluginManager.PluginInfo FindPlugin()
     {
-        ulong WORKSHOP_ID = 702070768;
+        ulong WORKSHOP_ID = 2727358367;
         string pluginName = "ExportElectricity";
-        /*
-        var e = Singleton<PluginManager>.instance.GetPluginsInfo().GetEnumerator();
-
-        while (e.MoveNext())
-        {
-            var item = e.Current;
-            if (item.name == pluginName)
-            {
-                return item;
-            }
-        }
-        */
 
         foreach (var mod in Singleton<PluginManager>.instance.GetPluginsInfo())
         {
