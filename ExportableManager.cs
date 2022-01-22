@@ -8,7 +8,7 @@ namespace Exportable
 {
 	public class ExportableManager
 	{
-		private SortedDictionary<string, Exportable> exportables;		
+		private SortedDictionary<string, Exportable> exportables = new SortedDictionary<string, Exportable>();
 		public const String CONF = "ExportElectricityModConfig.txt";
 		private float multiplier;
         private const double interval = 1.0;
@@ -16,7 +16,6 @@ namespace Exportable
 
 		public ExportableManager ()
 		{
-			exportables = new SortedDictionary<string, Exportable> ();
 			multiplier = 1.0f;
 
 			//new ExportableCremation (this);
@@ -31,7 +30,7 @@ namespace Exportable
 			new ExportableSewage (this);
 			new ExportableWater (this);
 
-			LoadSettings ();
+			LoadSettings();
 		}
 
 		public void Log (String msg)
@@ -41,7 +40,8 @@ namespace Exportable
 
 		public void AddExportable (Exportable exp)
 		{
-			exportables.Add (exp.Id, exp);
+			if (!exportables.ContainsKey(exp.Id))
+				exportables.Add (exp.Id, exp);
 		}
 
         public SortedDictionary<string, Exportable> GetExportables()
@@ -55,7 +55,7 @@ namespace Exportable
 			try {
 				using (System.IO.StreamReader file = 
 					new System.IO.StreamReader(CONF, true))
-				{					
+				{
 					String s = file.ReadLine ();
 					String [] sections = s.Split(new char[1]{'|'});
 					String [] ids;
@@ -154,7 +154,7 @@ namespace Exportable
 		private void MultiplierSliderChanged(float val)
 		{
 			multiplier = val;
-			StoreSettings();			
+			StoreSettings();
 		}
 
 		public void SetDebug (bool b)

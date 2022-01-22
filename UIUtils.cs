@@ -1,6 +1,7 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Plugins;
 using ColossalFramework.UI;
+using ExportElectricityMod;
 using System;
 using System.IO;
 //using System.Linq;
@@ -13,14 +14,24 @@ public static class UIUtils
     {
         ulong WORKSHOP_ID = 702070768;
         string pluginName = "ExportElectricity";
+        /*
         var e = Singleton<PluginManager>.instance.GetPluginsInfo().GetEnumerator();
 
         while (e.MoveNext())
         {
             var item = e.Current;
-            if (item.name == pluginName || item.publishedFileID.AsUInt64 == WORKSHOP_ID)
+            if (item.name == pluginName)
             {
                 return item;
+            }
+        }
+        */
+
+        foreach (var mod in Singleton<PluginManager>.instance.GetPluginsInfo())
+        {
+            if (mod.name == pluginName || mod.name == "csm-exportelectricity" || mod.publishedFileID.AsUInt64 == WORKSHOP_ID)
+            {
+                return mod;
             }
         }
 
@@ -28,8 +39,8 @@ public static class UIUtils
     }
 
     static string FindModPath()
-    {        
-        PluginManager.PluginInfo plugin = FindPlugin();
+    {
+        var plugin = FindPlugin();
         if (plugin != null)
         {
             return plugin.modPath;
@@ -54,8 +65,7 @@ public static class UIUtils
             throw new Exception("atlasMaterial null");
         }
 
-        byte[] bytes;
-        bytes = File.ReadAllBytes(Path.Combine(FindModPath(), textureFile));
+        var bytes = File.ReadAllBytes(Path.Combine(FindModPath(), textureFile));
 
         Texture2D tex = new Texture2D(spriteWidth * spriteNames.Length, spriteHeight, TextureFormat.ARGB32, false);
         tex.LoadImage(bytes);

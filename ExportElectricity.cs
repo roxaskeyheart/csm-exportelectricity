@@ -14,7 +14,7 @@ namespace ExportElectricityMod
 		private static Exportable.ExportableManager expm = null;
         public static UIComponent IncomePanel;
         public static float buttonX;
-        public static float buttonY;
+        public static float buttonY; 
         public static UIView view;
 
         public static Exportable.ExportableManager get()
@@ -31,7 +31,7 @@ namespace ExportElectricityMod
 	{
 		// Debugger.Write appends to a text file.  This is here because Debug.Log wasn't having any effect
 		// when called from OnUpdateMoneyAmount.  Maybe a Unity thing that event handlers can't log?  I dunno.
-		public static bool enabled = false; // don't commit
+		public static bool enabled = true; // don't commit
 		public static void Write(String s)
 		{
 			if (!enabled)
@@ -62,7 +62,7 @@ namespace ExportElectricityMod
 		public void OnSettingsUI(UIHelperBase helper)
 		{
 			UIHelperBase group = helper.AddGroup("Check to enable income from excess capacity");
-			ExpmHolder.get().AddOptions (group);			
+			ExpmHolder.get().AddOptions (group);
 		}
 	}
 
@@ -72,13 +72,13 @@ namespace ExportElectricityMod
 		private System.DateTime prevDate;
 
 		public override long OnUpdateMoneyAmount(long internalMoneyAmount)
-		{			
+		{
             try
             {
                 DistrictManager DMinstance = Singleton<DistrictManager>.instance;
                 Array8<District> dm_array = DMinstance.m_districts;
                 District d;
-	            
+
 	            Debugger.Write("\r\n== OnUpdateMoneyAmount ==");
 
 				double sec_per_day = 75600.0; // for some reason
@@ -121,7 +121,7 @@ namespace ExportElectricityMod
 						Debugger.Write("week_proportion zero");
 					}
 					prevDate = newDate;
-				}	            	
+                }
 			}
 	        catch (Exception ex)
 	        {
@@ -147,7 +147,7 @@ namespace ExportElectricityMod
                 }
             }
 
-            UIView view = UIView.GetAView();
+            var view = UIView.GetAView();
             ExpmHolder.view = view;
             var c = view.FindUIComponent("IncomePanel");
             ExpmHolder.IncomePanel = c;
@@ -155,6 +155,7 @@ namespace ExportElectricityMod
             var pos = c.absolutePosition;
             ExpmHolder.buttonX = (pos.x + c.width) * view.inputScale - 2;
             ExpmHolder.buttonY = (pos.y) * view.inputScale;
+
         }
 
 		public override void OnLevelUnloading()
@@ -175,11 +176,12 @@ namespace ExportElectricityMod
         private UIUtils.ImageButton button;
         private UIComponent tb;
 
+
         private void SetupUI()
-        {
+        {   
             uiSetup = true;
-            UIComponent policies = ExpmHolder.view.FindUIComponent("Policies");
-            tb = policies.parent; // TSBar/MainToolstrip
+            var policies = ExpmHolder.view.FindUIComponent("Policies");
+            tb = ExpmHolder.view.FindUIComponent("MainToolstrip"); // TSBar/MainToolstrip
             string[] imgtypes = new string[] { "normalBg", "disabledBg", "hoveredBg", "pressedBg", "focusedBg", "normalFg", "pressedFg" };
 
             button = tb.AddUIComponent<UIUtils.ImageButton>();
@@ -213,23 +215,22 @@ namespace ExportElectricityMod
         void ShowExportIncomeWindow(int windowID)
         {
             var em = ExpmHolder.get();
-            SortedDictionary<string, Exportable.Exportable> exportables = em.GetExportables();
-            var en = exportables.GetEnumerator();
+            var exportables = em.GetExportables();
             int totalEarned = 0;
 
-            while (en.MoveNext())
+            foreach(var exportable in exportables)
             {
-                var c = en.Current.Value;
+                var c = exportable.Value;
                 if (c.GetEnabled())
                 {
                     int earned = (int)(c.LastWeeklyEarning / 100.0);
                     totalEarned += earned;
 
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(en.Current.Value.Description);
+                    GUILayout.Label(exportable.Value.Description);
                     GUILayout.FlexibleSpace();
                     GUI.contentColor = Color.white;
-                    GUILayout.Label(earned.ToString());
+                    GUILayout.Label($"₡{earned}");
                     GUILayout.EndHorizontal();
                 }
             }
@@ -237,7 +238,7 @@ namespace ExportElectricityMod
             GUILayout.BeginHorizontal();
             GUILayout.Label("Total");
             GUILayout.FlexibleSpace();
-            GUILayout.Label(totalEarned.ToString());
+            GUILayout.Label($"₡{totalEarned}");
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();            

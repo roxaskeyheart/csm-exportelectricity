@@ -28,7 +28,7 @@ namespace Exportable
 		private double Rate;
 
 		public Exportable (ExportableManager inExpm, string inId, string inDescription, double inRate)
-		{			
+		{
 			Id = inId;
 			Description = inDescription;
 			Enabled = false;
@@ -44,7 +44,7 @@ namespace Exportable
 		}
 
 		public void SetEnabled (bool e)
-		{			
+		{
 			SetEnabled (e, true);
 		}
 
