@@ -1,7 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Plugins;
 using ColossalFramework.UI;
-using ExportElectricityMod;
 using System;
 using System.IO;
 //using System.Linq;
@@ -9,7 +8,7 @@ using UnityEngine;
 
 public static class UIUtils
 {
-    
+
     public static PluginManager.PluginInfo FindPlugin(string pluginName, ulong workshopID)
     {
         foreach (var mod in Singleton<PluginManager>.instance.GetPluginsInfo())
@@ -33,9 +32,9 @@ public static class UIUtils
         else
         {
             throw new Exception("Cannot find plugin path.");
-        }        
+        }
     }
-    
+
 
     public static UITextureAtlas CreateTextureAtlas(string modName, string textureFile, string atlasName, int spriteWidth, int spriteHeight, string[] spriteNames)
     {
@@ -55,7 +54,7 @@ public static class UIUtils
         var modpath = FindModPath();
 
         var bytes = File.ReadAllBytes($"{modpath}/{textureFile}");
-        
+
 
         Texture2D tex = new Texture2D(spriteWidth * spriteNames.Length, spriteHeight, TextureFormat.ARGB32, false);
         tex.LoadImage(bytes);

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace csm_exportelectricity
 {
@@ -24,9 +21,9 @@ namespace csm_exportelectricity
         /// </summary>
         /// <param name="includeStartDate">if the supplied date is on the specified day of the week, return that date or continue to the next date</param>
         /// <param name="searchForward">search forward or backward from the supplied date. if a null parameter is given, the closest weekday (ie in either direction) is returned</param>
-        public static DateTime ClosestWeekDay(this DateTime date, DayOfWeek weekday, bool includeStartDate = true, bool? searchForward=true)
+        public static DateTime ClosestWeekDay(this DateTime date, DayOfWeek weekday, bool includeStartDate = true, bool? searchForward = true)
         {
-            if (!searchForward.HasValue && !includeStartDate) 
+            if (!searchForward.HasValue && !includeStartDate)
             {
                 throw new ArgumentException("if searching in both directions, start date must be a valid result");
             }
@@ -47,9 +44,9 @@ namespace csm_exportelectricity
                     add = searchForward.Value ? 7 : -7;
                 }
             }
-            else if (add < -3) 
+            else if (add < -3)
             {
-                add += 7; 
+                add += 7;
             }
             else if (add > 3)
             {
