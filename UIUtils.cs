@@ -10,14 +10,11 @@ using UnityEngine;
 public static class UIUtils
 {
     
-    static PluginManager.PluginInfo FindPlugin()
+    public static PluginManager.PluginInfo FindPlugin(string pluginName, ulong workshopID)
     {
-        ulong WORKSHOP_ID = 2727374103;
-        string pluginName = "ExportElectricity";
-
         foreach (var mod in Singleton<PluginManager>.instance.GetPluginsInfo())
         {
-            if (mod.name == pluginName || mod.name == "csm-exportelectricity" || mod.publishedFileID.AsUInt64 == WORKSHOP_ID)
+            if (mod.name == pluginName || mod.name == "csm-exportelectricity" || mod.publishedFileID.AsUInt64 == workshopID)
             {
                 return mod;
             }
@@ -28,7 +25,7 @@ public static class UIUtils
 
     static string FindModPath()
     {
-        var plugin = FindPlugin();
+        var plugin = FindPlugin("ExportElectricity", 2727374103);
         if (plugin != null)
         {
             return plugin.modPath;

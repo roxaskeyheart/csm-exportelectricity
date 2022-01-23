@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using csm_exportelectricity;
 
 namespace ExportElectricityMod
 {
@@ -33,7 +34,7 @@ namespace ExportElectricityMod
 	{
 		// Debugger.Write appends to a text file.  This is here because Debug.Log wasn't having any effect
 		// when called from OnUpdateMoneyAmount.  Maybe a Unity thing that event handlers can't log?  I dunno.
-		public static bool enabled = false; // don't commit
+		public static bool enabled = true; // don't commit
 		public static void Write(String s)
 		{
 			if (!enabled)
@@ -70,8 +71,12 @@ namespace ExportElectricityMod
 
 	public class EconomyExtension : EconomyExtensionBase
 	{
-		private bool updated = false;
-		private System.DateTime prevDate;
+        private const DayOfWeek startDay = DayOfWeek.Sunday;
+		private bool updated;
+        private bool nextWeekSet;
+        private static bool IsRealTimeDetected;
+		private DateTime prevDate;
+        private DateTime nextWeek;
 
 		public override long OnUpdateMoneyAmount(long internalMoneyAmount)
 		{
@@ -80,11 +85,45 @@ namespace ExportElectricityMod
                 DistrictManager DMinstance = Singleton<DistrictManager>.instance;
                 Array8<District> dm_array = DMinstance.m_districts;
                 District d;
+                                
+                //New Week Calculation
+                Debugger.Write($"\r\n Now: {this.managers.threading.simulationTime}//{nextWeek}");
+                if (!nextWeekSet)
+                {
+                    //Calculate week
+                    Debugger.Write("First Run");
+                    nextWeek = this.managers.threading.simulationTime.ClosestWeekDay(startDay, false, true);
+                    Debugger.Write($"\r\n Set Next Week to: {nextWeek}");
+                    nextWeekSet = true;
 
+                    //Check if RealTime Mode Enabled
+                    var plugin = UIUtils.FindPlugin("RealTime", 1420955187);
+                    if (plugin != null && plugin.isEnabled)
+                    {
+                        IsRealTimeDetected = true;
+                        Debugger.Write($"\r\n Real Time Mod Detected!");
+                    }
+                }
+                else
+                {
+                    //Check for week change
+                    if (this.managers.threading.simulationTime >= nextWeek)
+                    {
+                        //Update Week
+                        Debugger.Write($"\r\n NEW WEEK!");
+                        nextWeek = this.managers.threading.simulationTime.ClosestWeekDay(startDay, false, true);
+                        Debugger.Write($"\r\n Set Next Week to: {nextWeek}");
+                        //updated = true;
+                        
+                    }
+					
+                }
+                                
+                
 	            Debugger.Write("\r\n== OnUpdateMoneyAmount ==");
 
-				double sec_per_day = 75600.0; // for some reason
-				double sec_per_week = 7 * sec_per_day;
+				//double sec_per_day = 75600.0; // for some reason
+				double sec_per_week;
 				double week_proportion = 0.0;
 				int export_earnings = 0;
 				int earnings_shown = 0;
@@ -98,32 +137,59 @@ namespace ExportElectricityMod
                 d = dm_array.m_buffer[0];
 
 				if (!updated) {
+
 					updated = true;
 					prevDate = this.managers.threading.simulationTime;
 					Debugger.Write("first run");
+
 				} else {
+
+                    /*
 					System.DateTime newDate = this.managers.threading.simulationTime;
 					System.TimeSpan timeDiff = newDate.Subtract (prevDate);
 					week_proportion = (((double) timeDiff.TotalSeconds) / sec_per_week);
-					if (week_proportion > 0.0) {
+                    */
+                    var newDate = this.managers.threading.simulationTime;
+					var timeDiff = newDate.Subtract(prevDate);
+
+                    if (IsRealTimeDetected)
+                    {
+                        //Real Time settings - Bi daily cycle
+                        sec_per_week = (newDate.AddHours(12) - newDate).TotalSeconds;
+                    }
+                    else
+                    {
+                        //Vanilla settings - 1 week cycle
+                        sec_per_week = (nextWeek - newDate.StartOfWeek(startDay)).TotalSeconds;
+                    }
+
+                    week_proportion = ((double)timeDiff.TotalSeconds) / sec_per_week;
+
+					if (week_proportion > 0.0 && week_proportion <= 1.0) {
 						Debugger.Write("proportion: " + week_proportion.ToString());
 						EconomyManager EM = Singleton<EconomyManager>.instance;
+
 						if (EM != null) {
 							// add income							
 							export_earnings = (int) ExpmHolder.get().CalculateIncome(d, week_proportion);
 							earnings_shown = export_earnings / 100;
 							Debugger.Write("Total earnings: " + earnings_shown.ToString());
-						EM.AddResource(EconomyManager.Resource.PublicIncome,
-								export_earnings,
-								ItemClass.Service.None,
-								ItemClass.SubService.None,
-								ItemClass.Level.None);
+						    EM.AddResource(EconomyManager.Resource.PublicIncome,
+								    export_earnings,
+								    ItemClass.Service.None,
+								    ItemClass.SubService.None,
+								    ItemClass.Level.None);
+
 						}
+
 					} else {
 						Debugger.Write("week_proportion zero");
 					}
-					prevDate = newDate;
+					
+                    prevDate = newDate;
                 }
+                
+                
 			}
 	        catch (Exception ex)
 	        {
@@ -210,7 +276,16 @@ namespace ExportElectricityMod
 
                 if (showingWindow)
                 {
-                    windowRect = GUILayout.Window(314, windowRect, ShowExportIncomeWindow, "Weekly Income from Exports");
+                    var plugin = UIUtils.FindPlugin("RealTime", 1420955187);
+                    if (plugin != null && plugin.isEnabled)
+                    {
+                        windowRect = GUILayout.Window(314, windowRect, ShowExportIncomeWindow, "Bi-Daily Income from Exports");
+                    }
+                    else
+                    {
+                        windowRect = GUILayout.Window(314, windowRect, ShowExportIncomeWindow, "Weekly Income from Exports");
+                    }
+                    
                 }
             }
         }

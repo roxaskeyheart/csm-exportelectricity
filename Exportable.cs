@@ -120,7 +120,7 @@ namespace Exportable
 
 		public override double GetConsumption(District d)
 		{
-			return (double) d.GetEducation1Need();
+			return (double) d.GetEducation1Need(); 
 		}
 	}
 

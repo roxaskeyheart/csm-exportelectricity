@@ -124,8 +124,13 @@ namespace Exportable
 		public double CalculateIncome (District d, double weekPortion)
 		{
 			double total = 0.0;
+			/*
+			if (!updated) {
+				return 0;
+			}
+			*/
 
-            waited += weekPortion;
+			waited += weekPortion;
             if (waited < interval)
             {
                 return 0;
