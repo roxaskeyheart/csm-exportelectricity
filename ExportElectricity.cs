@@ -31,7 +31,7 @@ namespace ExportElectricityMod
     {
         // Debugger.Write appends to a text file.  This is here because Debug.Log wasn't having any effect
         // when called from OnUpdateMoneyAmount.  Maybe a Unity thing that event handlers can't log?  I dunno.
-        public static bool enabled = true; // don't commit
+        public static bool enabled = false; // don't commit
         public static void Write(String s)
         {
             if (!enabled)
@@ -374,9 +374,6 @@ namespace ExportElectricityMod
             var exportables = em.GetExportables();
             int totalEarned = 0;
 
-            var bold = new GUIStyle();
-            bold.fontStyle = FontStyle.Bold;
-
             foreach (var exportable in exportables)
             {
                 var c = exportable.Value;
@@ -395,9 +392,9 @@ namespace ExportElectricityMod
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Total", bold);
+            GUILayout.Label("Total");
             GUILayout.FlexibleSpace();
-            GUILayout.Label($"₡{string.Format("{0:n0}", totalEarned)}", bold);
+            GUILayout.Label($"₡{string.Format("{0:n0}", totalEarned)}");
             GUILayout.EndHorizontal();
 
             //Blank Space
@@ -405,9 +402,9 @@ namespace ExportElectricityMod
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Next Payout", bold);
+            GUILayout.Label("Next Payout");
             GUILayout.FlexibleSpace();
-            GUILayout.Label(UIUtils.GetNextPayoutDate(), bold);
+            GUILayout.Label(UIUtils.GetNextPayoutDate());
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();

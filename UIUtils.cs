@@ -56,11 +56,11 @@ public static class UIUtils
     {
         if (showDate)
         {
-            _nextPayout = netPayout.ToString("dd MMM");
+            _nextPayout = netPayout.ToString("dd MMM (hh:mm tt)");
         }
         else
         {
-            _nextPayout = netPayout.ToString("HH:mm");
+            _nextPayout = netPayout.ToString("hh:mm tt");
         }
     }
 
