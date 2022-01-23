@@ -392,16 +392,16 @@ namespace ExportElectricityMod
                 }
             }
 
+            //Blank Space
+            GUILayout.BeginHorizontal();
+            GUILayout.EndHorizontal();
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Total");
             GUILayout.FlexibleSpace();
             GUILayout.Label($"₡{string.Format("{0:n0}", totalEarned)}");
             GUILayout.EndHorizontal();
-
-            //Blank Space
-            GUILayout.BeginHorizontal();
-            GUILayout.EndHorizontal();
-
+            
             GUILayout.BeginHorizontal();
             GUILayout.Label("Next Payout");
             GUILayout.FlexibleSpace();
