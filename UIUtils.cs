@@ -64,6 +64,11 @@ public static class UIUtils
         }
     }
 
+    public static void ResetPayout()
+    {
+        _nextPayout = @"";
+    }
+
 
     public static UITextureAtlas CreateTextureAtlas(string modName, string textureFile, string atlasName, int spriteWidth, int spriteHeight, string[] spriteNames)
     {

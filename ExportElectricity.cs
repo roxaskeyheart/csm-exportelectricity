@@ -32,18 +32,20 @@ namespace ExportElectricityMod
         // Debugger.Write appends to a text file.  This is here because Debug.Log wasn't having any effect
         // when called from OnUpdateMoneyAmount.  Maybe a Unity thing that event handlers can't log?  I dunno.
         public static bool enabled = false; // don't commit
-        public static void Write(String s)
+        public static void Write(string s)
         {
             if (!enabled)
             {
                 return;
             }
 
-            using (System.IO.FileStream file = new System.IO.FileStream("ExportElectricityModDebug.txt", FileMode.Append))
+            using (var file = new FileStream("ExportElectricityModDebug.txt", FileMode.Append))
             {
-                StreamWriter sw = new StreamWriter(file);
-                sw.WriteLine(s);
-                sw.Flush();
+                using (var sw = new StreamWriter(file))
+                {
+                    sw.WriteLine(s);
+                    sw.Flush();
+                }
             }
         }
     }
@@ -177,23 +179,22 @@ namespace ExportElectricityMod
                                 break;
                             //1 week
                             case 4:
-                                rtinterval = 0;
+                                rtinterval = 168;
                                 break;
                         }
 
-                        if (rtinterval == 0)
+                        if (rtinterval > 24)
                         {
-                            sec_per_week = (nextWeek - newDate.StartOfWeek(startDay)).TotalSeconds;
+                            
                             showDate = true;
                         }
                         else
                         {
-                            sec_per_week = (newDate.AddHours(rtinterval) - newDate).TotalSeconds;
                             showDate = false;
                         }
+                                                
+                        sec_per_week = (newDate.AddHours(rtinterval) - newDate).TotalSeconds;
 
-                        
-                        
                     }
                     else
                     {
@@ -205,17 +206,16 @@ namespace ExportElectricityMod
                     if (newDate > EstDate || ExpmHolder.get().GetRealTimeInterval() != changeInterval)
                     {
                         Debugger.Write($"Set Next Payout to: {EstDate}");
-                        EstDate = newDate.AddSeconds(sec_per_week);
+                        EstDate = newDate.AddSeconds(sec_per_week - 75600);
                         changeInterval = ExpmHolder.get().GetRealTimeInterval();
                         UIUtils.SetNextPayout(EstDate, showDate);
                     }
                     
-
                     week_proportion = ((double)timeDiff.TotalSeconds) / sec_per_week;
 
                     if (week_proportion > 0.0 && week_proportion <= 1.0)
                     {
-                        Debugger.Write("proportion: " + week_proportion.ToString());
+                        Debugger.Write("Proportion: " + week_proportion.ToString("F20"));
                         EconomyManager EM = Singleton<EconomyManager>.instance;
 
                         if (EM != null)
@@ -255,6 +255,7 @@ namespace ExportElectricityMod
         public override void OnLevelLoaded(LoadMode mode)
         {
             ExpmHolder.get().ClearExportables();
+            UIUtils.ResetPayout();
             Debugger.Write("Clearing Tables");
 
             if (ExportUIObj == null)

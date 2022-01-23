@@ -188,7 +188,7 @@ namespace Exportable
 
             textbox = group.AddSlider($"Multiplier", 0.0f, 2.0f, 0.05f, multiplier, MultiplierSliderChanged) as UISlider;
 
-            var dropdown = group.AddDropdown("Real Time Mod Interval", new string[] { "3 Hours", "6 Hours", "12 Hours", "1 Day", "1 Week" }, 2, RealTimeModInterval) as UIDropDown;
+            var dropdown = group.AddDropdown("Real Time Mod Interval", new string[] { "3 Hours", "6 Hours", "12 Hours", "1 Day", "1 Week" }, realtimeinterval, RealTimeModInterval) as UIDropDown;
             dropdown.tooltip = @"When using Real Time Mod, the payout cycle will be affected by the interval selected here. Default: 6 hours.";
 
             group.AddCheckbox("Debug Mode", ExportElectricityMod.Debugger.enabled, SetDebug);
