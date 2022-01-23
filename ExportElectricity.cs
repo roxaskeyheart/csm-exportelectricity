@@ -31,7 +31,7 @@ namespace ExportElectricityMod
     {
         // Debugger.Write appends to a text file.  This is here because Debug.Log wasn't having any effect
         // when called from OnUpdateMoneyAmount.  Maybe a Unity thing that event handlers can't log?  I dunno.
-        public static bool enabled = true; // don't commit
+        public static bool enabled = false; // don't commit
         public static void Write(String s)
         {
             if (!enabled)
@@ -52,7 +52,7 @@ namespace ExportElectricityMod
     {
         public string Name
         {
-            get { return "Export Electricity Revisited [2.1.2]"; }
+            get { return "Export Electricity Revisited [2.2.0]"; }
         }
 
         public string Description
