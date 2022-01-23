@@ -11,6 +11,7 @@ namespace Exportable
         private SortedDictionary<string, Exportable> exportables = new SortedDictionary<string, Exportable>();
         public const String CONF = "ExportElectricityModConfig.txt";
         private float multiplier;
+        private int realtimeinterval = 2;
         private const double interval = 1.0;
         private double waited = 0.0;
         private UISlider textbox;
@@ -34,7 +35,7 @@ namespace Exportable
             LoadSettings();
         }
 
-        public void Log(String msg)
+        public void Log(string msg)
         {
             ExportElectricityMod.Debugger.Write(msg);
         }
@@ -55,22 +56,28 @@ namespace Exportable
             Log("Load Settings");
             try
             {
-                using (System.IO.StreamReader file =
-                    new System.IO.StreamReader(CONF, true))
+                using (var file = new StreamReader(CONF, true))
                 {
-                    String s = file.ReadLine();
-                    String[] sections = s.Split(new char[1] { '|' });
-                    String[] ids;
+                    var s = file.ReadLine();
+                    var sections = s.Split(new char[1] { '|' });
 
-                    ids = sections[0].Split(new char[1] { ',' });
-                    if (sections.Length >= 2)
+                    var ids = sections[0].Split(new char[1] { ',' });
+                    if (sections.Length == 3)
                     {
                         multiplier = float.Parse(sections[1]);
+                        realtimeinterval = int.Parse(sections[2]);
+                    }
+                    else if (sections.Length == 2)
+                    {
+                        multiplier = float.Parse(sections[1]);
+                        realtimeinterval = 2;
                     }
                     else
                     {
                         multiplier = 1.0f;
+                        realtimeinterval = 2;
                     }
+
 
                     foreach (var id in ids)
                     {
@@ -84,8 +91,20 @@ namespace Exportable
             catch (Exception e)
             {
                 // no file? use defaults
-                Log("Using defaults: " + e.ToString());
+                Log("Using Defaults: " + e.ToString());
                 exportables[Ids.ELECTRICITY].SetEnabled(true);
+            }
+        }
+
+        public void ClearExportables()
+        {
+            foreach (var exportable in exportables)
+            {
+                var exp = exportable.Value;
+                exp.LastWeeklyEarning = 0;
+
+                if (exportables.ContainsKey(exportable.Key))
+                    exportables[exportable.Key] = exp;
             }
         }
 
@@ -94,22 +113,23 @@ namespace Exportable
             Log("Store Settings");
             try
             {
-                using (System.IO.FileStream file =
-                    new System.IO.FileStream(CONF, FileMode.Create))
+                using (var file = new FileStream(CONF, FileMode.Create))
                 {
-                    List<String> enabled_ids = new List<String>();
-                    StreamWriter sw = new StreamWriter(file);
-                    foreach (var pair in exportables)
+                    var enabled_ids = new List<string>();
+                    using (var sw = new StreamWriter(file))
                     {
-                        if (pair.Value.GetEnabled())
+                        foreach (var pair in exportables)
                         {
-                            enabled_ids.Add(pair.Key);
+                            if (pair.Value.GetEnabled())
+                            {
+                                enabled_ids.Add(pair.Key);
+                            }
                         }
+                        var cs = string.Join(",", enabled_ids.ToArray()) + "|" + multiplier.ToString() + "|" + realtimeinterval.ToString();
+                        Log("Storing settings - enabled: " + cs);
+                        sw.WriteLine(cs);
+                        sw.Flush();
                     }
-                    String cs = String.Join(",", enabled_ids.ToArray()) + "|" + multiplier.ToString();
-                    Log("Storing settings - enabled: " + cs);
-                    sw.WriteLine(cs);
-                    sw.Flush();
                 }
             }
             catch (Exception e)
@@ -118,7 +138,7 @@ namespace Exportable
             }
         }
 
-        public double CalculateIncome(District d, String id, double weekPortion)
+        public double CalculateIncome(District d, string id, double weekPortion)
         {
             double income = 0.0;
 
@@ -167,6 +187,10 @@ namespace Exportable
             }
 
             textbox = group.AddSlider($"Multiplier", 0.0f, 2.0f, 0.05f, multiplier, MultiplierSliderChanged) as UISlider;
+
+            var dropdown = group.AddDropdown("Real Time Mod Interval", new string[] { "3 Hours", "6 Hours", "12 Hours", "1 Day", "1 Week" }, 2, RealTimeModInterval) as UIDropDown;
+            dropdown.tooltip = @"When using Real Time Mod, the payout cycle will be affected by the interval selected here. Default: 6 hours.";
+
             group.AddCheckbox("Debug Mode", ExportElectricityMod.Debugger.enabled, SetDebug);
         }
 
@@ -181,9 +205,21 @@ namespace Exportable
             StoreSettings();
         }
 
+        private void RealTimeModInterval(int index)
+        {
+            realtimeinterval = index;
+
+            StoreSettings();
+        }
+
         public void SetDebug(bool b)
         {
             ExportElectricityMod.Debugger.enabled = b;
+        }
+
+        public int GetRealTimeInterval()
+        {
+            return realtimeinterval;
         }
     }
 }

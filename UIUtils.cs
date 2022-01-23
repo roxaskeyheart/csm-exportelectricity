@@ -8,6 +8,7 @@ using UnityEngine;
 
 public static class UIUtils
 {
+    private static string _nextPayout;
 
     public static PluginManager.PluginInfo FindPlugin(string pluginName, ulong workshopID)
     {
@@ -32,6 +33,34 @@ public static class UIUtils
         else
         {
             throw new Exception("Cannot find plugin path.");
+        }
+    }
+
+    public static bool CheckRealTimeEnabled()
+    {
+        var plugin = FindPlugin("RealTime", 1420955187);
+        if (plugin != null && plugin.isEnabled)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static string GetNextPayoutDate()
+    {
+        return _nextPayout;
+    }
+
+    public static void SetNextPayout(DateTime netPayout, bool showDate)
+    {
+        if (showDate)
+        {
+            _nextPayout = netPayout.ToString("dd MMM");
+        }
+        else
+        {
+            _nextPayout = netPayout.ToString("HH:mm");
         }
     }
 
