@@ -308,7 +308,7 @@ namespace ExportElectricityMod
                     GUILayout.Label(exportable.Value.Description);
                     GUILayout.FlexibleSpace();
                     GUI.contentColor = Color.white;
-                    GUILayout.Label($"₡{earned}");
+                    GUILayout.Label($"₡{string.Format("{0:n0}", earned)}");
                     GUILayout.EndHorizontal();
                 }
             }
@@ -316,7 +316,7 @@ namespace ExportElectricityMod
             GUILayout.BeginHorizontal();
             GUILayout.Label("Total");
             GUILayout.FlexibleSpace();
-            GUILayout.Label($"₡{totalEarned}");
+            GUILayout.Label($"₡{string.Format("{0:n0}", totalEarned)}");
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();            
